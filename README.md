@@ -1,5 +1,5 @@
 # gps_health_tracker
-このアプリは実験の協力者のGPS情報とHealtkConnect(iOSはHealthkit)の情報をトラッキングするためのものです。
+このアプリは実験の協力者のGPS情報とHealthConnect(iOSはHealthkit)の情報をトラッキングするためのものです。
 実験の最終目標は、認知症の兆候をGPS情報とHealthkitの情報を使って検出することです。
 もし実験に興味がある方がいらっしゃいましたら、ご連絡いただけると幸いです。
 shunk0616@gmail.com
