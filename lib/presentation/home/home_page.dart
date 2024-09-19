@@ -1,17 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gps_health_tracker/presentation/setting/setting_page.dart';
+import 'package:gps_health_tracker/presentation/home/survey_dialog.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
-  
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+// 既存のアンケート回答者にも新しく回答して欲しくなったら、このバージョンを上げる
+// TODO: constはファイルでまとめて管理する
+const int currentSurveyVersion = 2;
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    _checkSurveyVersion();
+  }
+
+  Future<void> _checkSurveyVersion() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? latestSurveyVersion = prefs.getInt('latest_survey_version');
+
+    if (latestSurveyVersion == null ||
+        latestSurveyVersion < currentSurveyVersion) {
+      _showSurveyDialog();
+    }
+  }
+
+  void _showSurveyDialog() {
+    showDialog(
+      context: context,
+      // 誤タップでダイアログが閉じることを防止
+      barrierDismissible: false,
+      builder: (context) => const SurveyDialog(
+        currentSurveyVersion: currentSurveyVersion,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text("ホームページ"),
+        title: const Text('ホームページ'),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -36,7 +71,8 @@ class HomePage extends StatelessWidget {
                     ),
               ),
               TextSpan(
-                text: '以上でアンケートは終了です。\nあとはできるだけスマートフォンを持ち歩いていただければ嬉しいです。\n加藤より',
+                text:
+                    '以上でアンケートは終了です。\nあとはできるだけスマートフォンを持ち歩いていただければ嬉しいです。\n加藤より',
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       fontSize: 16.0,
                     ),
