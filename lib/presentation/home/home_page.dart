@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:gps_health_tracker/presentation/setting/setting_page.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key, required this.title});
+  const HomePage({super.key});
 
-  final String title;
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(title),
+        title: const Text("ホームページ"),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
