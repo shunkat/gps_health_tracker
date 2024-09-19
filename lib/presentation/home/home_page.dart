@@ -44,40 +44,45 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('ホームページ'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingPage()),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Center(
-        child: RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: '実験へのご協力ありがとうございます。\n',
-                style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                      fontSize: 24.0,
-                    ),
-              ),
-              TextSpan(
-                text:
-                    '以上でアンケートは終了です。\nあとはできるだけスマートフォンを持ち歩いていただければ嬉しいです。\n加藤より',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      fontSize: 16.0,
-                    ),
-              ),
-            ],
+    return WillPopScope(
+      // デバイスの戻るボタンを無効化
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('ホームページ'),
+          automaticallyImplyLeading: false, // AppBarの戻るボタンを非表示にする
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingPage()),
+                );
+              },
+            ),
+          ],
+        ),
+        body: Center(
+          child: RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: '実験へのご協力ありがとうございます。\n',
+                  style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                        fontSize: 24.0,
+                      ),
+                ),
+                TextSpan(
+                  text:
+                      '以上でアンケートは終了です。\nあとはできるだけスマートフォンを持ち歩いていただければ嬉しいです。\n加藤より',
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        fontSize: 16.0,
+                      ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
