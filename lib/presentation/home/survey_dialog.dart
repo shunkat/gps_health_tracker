@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SurveyDialog extends StatefulWidget {
   final int currentSurveyVersion;
@@ -13,30 +14,75 @@ class SurveyDialog extends StatefulWidget {
 class _SurveyDialogState extends State<SurveyDialog> {
   final _formKey = GlobalKey<FormState>();
 
+  // コントローラーの定義
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _smokingPerDayController = TextEditingController();
+  final TextEditingController _smokingYearsController = TextEditingController();
 
+  // 状態変数の定義
   String? _gender;
   String? _walkingDisorders;
   String? _dementiaDiagnosis;
   String? _dementiaDiagnosisDetails;
   String? _exerciseHabit;
   String? _familyComposition;
+  String? _address;
+  String? _isEmployed;
+  String? _smokingPerDay;
+  String? _smokingYears;
 
   @override
   void dispose() {
     _nameController.dispose();
     _ageController.dispose();
+    _addressController.dispose();
+    _smokingPerDayController.dispose();
+    _smokingYearsController.dispose();
     super.dispose();
   }
 
   Future<void> _saveSurveyData() async {
+    // バリデーション
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 
-    // TODO: Firestoreに保存する
-    // String name = _nameController.text;
-    // int? age = int.tryParse(_ageController.text);
+    try {
+      // SharedPreferences を使用して latest_survey_version を currentSurveyVersion で上書き
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('latest_survey_version', widget.currentSurveyVersion);
+
+      // TODO: Firestore にデータを保存する
+      // 例:
+      // String name = _nameController.text;
+      // int? age = int.tryParse(_ageController.text);
+      // String? address = _addressController.text;
+      // String? isEmployed = _isEmployed;
+      // int? smokingPerDay = int.tryParse(_smokingPerDayController.text);
+      // int? smokingYears = int.tryParse(_smokingYearsController.text);
+      // String? gender = _gender;
+      // String? walkingDisorders = _walkingDisorders;
+      // String? dementiaDiagnosis = _dementiaDiagnosis;
+      // String? dementiaDiagnosisDetails = _dementiaDiagnosisDetails;
+      // String? exerciseHabit = _exerciseHabit;
+      // String? familyComposition = _familyComposition;
+
+      // Firestore 保存ロジックをここに追加
+
+      // 成功メッセージを表示（任意）
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('アンケートが正常に送信されました。')),
+      );
+
+      // ダイアログを閉じる
+      Navigator.of(context).pop();
+    } catch (e) {
+      // エラーハンドリング
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('設定の保存に失敗しました。再度お試しください。')),
+      );
+    }
   }
 
   Widget _buildTextFormField({
@@ -75,11 +121,11 @@ class _SurveyDialogState extends State<SurveyDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.all(10),
-      // TODO: WillPopScopeではなく、PopScropeを使うようにする
-      child: WillPopScope(
-        onWillPop: () async => false,
+    return WillPopScope(
+      // 戻るボタンを無効化
+      onWillPop: () async => false,
+      child: Dialog(
+        insetPadding: const EdgeInsets.all(10),
         child: Scaffold(
           appBar: AppBar(
             title: const Text('協力者の方へのアンケート'),
@@ -159,7 +205,7 @@ class _SurveyDialogState extends State<SurveyDialog> {
                     ),
                     if (_dementiaDiagnosis == 'はい') ...[
                       const SizedBox(height: 16),
-                      // Conditional Question
+                      // 条件付き質問
                       _buildTextFormField(
                         labelText:
                             'どのような診断を受けたかを差し支えない範囲で教えてください。',
@@ -188,12 +234,76 @@ class _SurveyDialogState extends State<SurveyDialog> {
                         return null;
                       },
                     ),
+                    const SizedBox(height: 16),
+                    // 8. 住所（任意）
+                    _buildTextFormField(
+                      labelText: '住所（任意）',
+                      controller: _addressController,
+                      // バリデーションなしで任意入力
+                    ),
+                    const SizedBox(height: 16),
+                    // 9. 仕事をしているか？
+                    _buildDropdownFormField(
+                      labelText: '仕事をしているか？',
+                      value: _isEmployed,
+                      items: ['はい', 'いいえ'],
+                      onChanged: (value) => setState(() => _isEmployed = value),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return '選択してください';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    // 10. 喫煙歴（一日何本 x 何年間）
+                    const Text(
+                      '喫煙歴（一日何本 x 何年間）',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // 一日何本吸うか
+                    _buildTextFormField(
+                      labelText: '一日に吸う本数',
+                      controller: _smokingPerDayController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return '一日に吸う本数を入力してください';
+                        }
+                        if (int.tryParse(value) == null) {
+                          return '正しい数値を入力してください';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) => _smokingPerDay = value,
+                    ),
+                    const SizedBox(height: 8),
+                    // 喫煙年数
+                    _buildTextFormField(
+                      labelText: '喫煙年数',
+                      controller: _smokingYearsController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return '喫煙年数を入力してください';
+                        }
+                        if (int.tryParse(value) == null) {
+                          return '正しい数値を入力してください';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) => _smokingYears = value,
+                    ),
                     const SizedBox(height: 24),
                     Center(
                       child: ElevatedButton(
                         onPressed: () async {
                           await _saveSurveyData();
-                          Navigator.of(context).pop();
+                          // Navigator.of(context).pop(); // ダイアログを閉じる処理は _saveSurveyData 内で行います
                         },
                         child: const Text('送信'),
                       ),
@@ -207,4 +317,16 @@ class _SurveyDialogState extends State<SurveyDialog> {
       ),
     );
   }
+}
+
+// ダイアログを表示する関数の例
+void showSurveyDialog(BuildContext context, int currentSurveyVersion) {
+  showDialog(
+    context: context,
+    barrierDismissible:
+        false, // 外部タップでダイアログが閉じないようにする
+    builder: (BuildContext context) {
+      return SurveyDialog(currentSurveyVersion: currentSurveyVersion);
+    },
+  );
 }
