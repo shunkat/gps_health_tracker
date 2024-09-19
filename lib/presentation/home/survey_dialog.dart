@@ -83,6 +83,7 @@ class _SurveyDialogState extends State<SurveyDialog> {
         child: Scaffold(
           appBar: AppBar(
             title: const Text('協力者の方へのアンケート'),
+            automaticallyImplyLeading: false, // 戻るボタンを非表示にする
           ),
           body: SingleChildScrollView(
             child: Padding(
