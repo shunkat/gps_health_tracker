@@ -2,6 +2,7 @@
     "java.compile.nullAnalysis.mode": "automatic",
     "editor.formatOnSave": true,
     "cSpell.words": [
-        "Healthkit"
+        "Healthkit",
+        "prefs"
     ]
 }
