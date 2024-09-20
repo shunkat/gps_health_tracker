@@ -10,9 +10,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-// 既存のアンケート回答者にも新しく回答して欲しくなったら、このバージョンを上げる
-// TODO: constはファイルでまとめて管理する
-const int currentSurveyVersion = 1;
+
 
 class _HomePageState extends State<HomePage> {
   @override
