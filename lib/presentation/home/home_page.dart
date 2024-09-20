@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gps_health_tracker/domain/constraints.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gps_health_tracker/presentation/setting/setting_page.dart';
-import 'package:gps_health_tracker/presentation/home/survey_dialog.dart';
+import 'package:gps_health_tracker/presentation/widgets/survey_dialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -34,9 +35,7 @@ class _HomePageState extends State<HomePage> {
       context: context,
       // 誤タップでダイアログが閉じることを防止
       barrierDismissible: false,
-      builder: (context) => const SurveyDialog(
-        currentSurveyVersion: currentSurveyVersion,
-      ),
+      builder: (context) => const SurveyDialog(),
     );
   }
 
