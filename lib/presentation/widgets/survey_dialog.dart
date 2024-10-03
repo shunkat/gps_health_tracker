@@ -1,11 +1,12 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:gps_health_tracker/domain/constraints.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SurveyDialog extends StatefulWidget {
-  final int currentSurveyVersion;
-
-  const SurveyDialog({Key? key, required this.currentSurveyVersion})
-      : super(key: key);
+  const SurveyDialog({super.key});
+  
 
   @override
   _SurveyDialogState createState() => _SurveyDialogState();
@@ -51,7 +52,7 @@ class _SurveyDialogState extends State<SurveyDialog> {
     try {
       // SharedPreferences を使用して latest_survey_version を currentSurveyVersion で上書き
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('latest_survey_version', widget.currentSurveyVersion);
+      await prefs.setInt('latest_survey_version', currentSurveyVersion);
 
       // TODO: Firestore にデータを保存する
       // 例:
@@ -320,13 +321,13 @@ class _SurveyDialogState extends State<SurveyDialog> {
 }
 
 // ダイアログを表示する関数の例
-void showSurveyDialog(BuildContext context, int currentSurveyVersion) {
+void showSurveyDialog(BuildContext context, bool canPop) {
   showDialog(
     context: context,
     barrierDismissible:
-        false, // 外部タップでダイアログが閉じないようにする
+        canPop, // ダイアログ外をタップして閉じることを許可するかどうかを指定
     builder: (BuildContext context) {
-      return SurveyDialog(currentSurveyVersion: currentSurveyVersion);
+      return const SurveyDialog();
     },
   );
 }
