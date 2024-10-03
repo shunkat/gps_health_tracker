@@ -18,7 +18,7 @@ class SettingPage extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                showSurveyDialog(context);
+                showSurveyDialog(context, true);
               },
               child: const Text('アンケート再回答'),
             ),

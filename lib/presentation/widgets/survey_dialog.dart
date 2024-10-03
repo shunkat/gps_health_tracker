@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:gps_health_tracker/domain/constraints.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -319,11 +321,11 @@ class _SurveyDialogState extends State<SurveyDialog> {
 }
 
 // ダイアログを表示する関数の例
-void showSurveyDialog(BuildContext context) {
+void showSurveyDialog(BuildContext context, bool canPop) {
   showDialog(
     context: context,
     barrierDismissible:
-        false, // 外部タップでダイアログが閉じないようにする
+        canPop, // ダイアログ外をタップして閉じることを許可するかどうかを指定
     builder: (BuildContext context) {
       return const SurveyDialog();
     },
