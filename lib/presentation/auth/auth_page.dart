@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gps_health_tracker/infrastructure/firebase/firebase_auth.dart';
 import 'package:gps_health_tracker/presentation/home/home_page.dart';
 
 class AuthPage extends StatefulWidget {
@@ -29,7 +30,7 @@ class AuthPageState extends State<AuthPage> {
 
   void _onTextChanged() {
     setState(() {
-      _isButtonEnabled = _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty;
+      _isButtonEnabled = _emailController.text.isNotEmpty;
     });
   }
 
@@ -44,25 +45,23 @@ class AuthPageState extends State<AuthPage> {
 
   void _onPressed() {
     final email = _emailController.text;
-    final password = _passwordController.text;
 
     if (!_validateEmail(email)) {
       _showErrorDialog('メールアドレスがおかしいようです。正しい形式で入力してください。');
       return;
     }
 
-    if (!_validatePassword(password)) {
-      _showErrorDialog('パスワードは8桁以上で入力してください。');
-      return;
-    }
-
-    // バリデーションが成功した場合、次のページに遷移
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const HomePage(),
-      ),
-    );
+    // 匿名認証する
+    FirebaseAuthInfra().signInAnonymously().then((userCredential) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ),
+      );
+    }).catchError((e) {
+      print("Unexpected error occurred.");
+    });
   }
 
   void _showErrorDialog(String message) {
@@ -103,16 +102,6 @@ class AuthPageState extends State<AuthPage> {
                   labelText: 'メールアドレス',
                 ),
                 keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'パスワード',
-                  hintText: 'このパスワードを忘れないようにどこかにメモしてください。',
-                ),
-                obscureText: true,
               ),
               const SizedBox(height: 16),
               ElevatedButton(
