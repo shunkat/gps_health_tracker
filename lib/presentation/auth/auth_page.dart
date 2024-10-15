@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gps_health_tracker/domain/repository/user_repository.dart';
 import 'package:gps_health_tracker/infrastructure/firebase/firebase_auth.dart';
-import 'package:gps_health_tracker/presentation/home/home_page.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -10,55 +10,49 @@ class AuthPage extends StatefulWidget {
 }
 
 class AuthPageState extends State<AuthPage> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _nicknameController = TextEditingController();
   bool _isButtonEnabled = false;
 
   @override
   void initState() {
     super.initState();
-    _emailController.addListener(_onTextChanged);
-    _passwordController.addListener(_onTextChanged);
+    _nicknameController.addListener(_onTextChanged);
   }
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
+    _nicknameController.dispose();
     super.dispose();
   }
 
   void _onTextChanged() {
     setState(() {
-      _isButtonEnabled = _emailController.text.isNotEmpty;
+      _isButtonEnabled = _nicknameController.text.isNotEmpty;
     });
   }
 
-  bool _validateEmail(String email) {
-    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    return emailRegex.hasMatch(email);
-  }
-
-  bool _validatePassword(String password) {
-    return password.length >= 8;
+  bool _validateNickname(String nickname) {
+    return nickname.isNotEmpty;
   }
 
   void _onPressed() {
-    final email = _emailController.text;
+    final nickname = _nicknameController.text;
 
-    if (!_validateEmail(email)) {
-      _showErrorDialog('メールアドレスがおかしいようです。正しい形式で入力してください。');
+    if (!_validateNickname(nickname)) {
+      _showErrorDialog('ニックネームを入力してください。');
       return;
     }
 
+    
+
     // 匿名認証する
     FirebaseAuthInfra().signInAnonymously().then((userCredential) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ),
-      );
+      // ユーザー情報を登録する
+      UserRepository().registerUser(nickname, userCredential.user!.uid).then((_) {
+
+      }).catchError((e) {
+        print("Failed to register user: $e");
+      });
     }).catchError((e) {
       print("Unexpected error occurred.");
     });
@@ -96,12 +90,12 @@ class AuthPageState extends State<AuthPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               TextField(
-                controller: _emailController,
+                controller: _nicknameController,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'メールアドレス',
+                  labelText: 'お名前(あだ名で構いません)',
                 ),
-                keyboardType: TextInputType.emailAddress,
+                keyboardType: TextInputType.text,
               ),
               const SizedBox(height: 16),
               ElevatedButton(
